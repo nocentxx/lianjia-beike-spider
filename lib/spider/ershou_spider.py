@@ -62,18 +62,21 @@ class ErShouSpider(BaseSpider):
         page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_name, SPIDER_NAME, area_name)
         print(page)  # 打印版块页面地址
         headers = create_headers()
-        response = requests.get(page, timeout=10, headers=headers)
+        response = requests.get(page, timeout=50, headers=headers)
         html = response.content
         soup = BeautifulSoup(html, "lxml")
 
         # 获得总的页数，通过查找总页码的元素信息
         try:
-            page_box = soup.find_all('div', class_='page-box')[0]
+            page_box_class = 'page-box house-lst-page-box'
+            page_box = soup.find_all('div', class_=page_box_class)
             matches = re.search('.*"totalPage":(\d+),.*', str(page_box))
             total_page = int(matches.group(1))
+            print("{0}.total_page: {1}".format(area_name, total_page))
         except Exception as e:
             print("\tWarning: only find one page for {0}".format(area_name))
             print(e)
+
 
         # 从第一页开始,一直遍历到最后一页
         for num in range(1, total_page + 1):
@@ -84,25 +87,43 @@ class ErShouSpider(BaseSpider):
             response = requests.get(page, timeout=10, headers=headers)
             html = response.content
             soup = BeautifulSoup(html, "lxml")
+            #print("debug soup: ", soup)
 
+            li_class = 'clear LOGVIEWDATA LOGCLICKDATA'
+            totalprice_class = 'totalPrice totalPrice2'
+            unitprice_class = 'unitPrice'
+            position_class = 'positionInfo'
+            title_class = 'title'
+            house_class = 'houseInfo'
+            img_class = 'lj-lazy'
             # 获得有小区信息的panel
-            house_elements = soup.find_all('li', class_="clear")
+            house_elements = soup.find_all('li', class_=li_class)
+            #print("debug, house_elements: ", house_elements)
             for house_elem in house_elements:
-                price = house_elem.find('div', class_="totalPrice")
-                name = house_elem.find('div', class_='title')
-                desc = house_elem.find('div', class_="houseInfo")
-                pic = house_elem.find('a', class_="img").find('img', class_="lj-lazy")
+                title = house_elem.find('div', class_=title_class)
+                position = house_elem.find('div', class_=position_class)
+                total_price = house_elem.find('div', class_=totalprice_class)
+                unit_price = house_elem.find('div', class_=unitprice_class)
+                desc = house_elem.find('div', class_=house_class)
+                pic = house_elem.find('img', class_=img_class)
 
                 # 继续清理数据
-                price = price.text.strip()
-                name = name.text.replace("\n", "")
-                desc = desc.text.replace("\n", "").strip()
-                pic = pic.get('data-original').strip()
-                # print(pic)
+                #print(title.text.strip)
+                #print(position.text)
+                #print(total_price.text)
+                #print(unit_price.text)
+                #print(desc.text)
+                #print(pic.get('data-original'))
+                title_text = title.text.replace("\n", "")
+                position_text = position.text.replace("\n", "")
+                total_price_text = total_price.text.strip()
+                unit_price_text = unit_price.text.strip()
+                desc_text = desc.text.replace("\n", "").strip()
+                pic_url = pic.get('data-original').strip()
 
 
                 # 作为对象保存
-                ershou = ErShou(chinese_district, chinese_area, name, price, desc, pic)
+                ershou = ErShou(chinese_district, chinese_area, title_text, total_price_text, desc_text, pic_url)
                 ershou_list.append(ershou)
         return ershou_list
 
@@ -134,7 +155,6 @@ class ErShouSpider(BaseSpider):
         nones = [None for i in range(len(areas))]
         city_list = [city for i in range(len(areas))]
         args = zip(zip(city_list, areas), nones)
-        # areas = areas[0: 1]   # For debugging
 
         # 针对每个板块写一个文件,启动一个线程来操作
         pool_size = thread_pool_size

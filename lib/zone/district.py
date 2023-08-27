@@ -31,12 +31,13 @@ def get_districts(city):
     :param city: 城市
     :return: 英文区县名列表
     """
-    url = 'https://{0}.{1}.com/xiaoqu/'.format(city, SPIDER_NAME)
+    url = 'https://{0}.{1}.com/ershoufang/'.format(city, SPIDER_NAME)
     headers = create_headers()
     response = requests.get(url, timeout=10, headers=headers)
     html = response.content
     root = etree.HTML(html)
     elements = root.xpath(CITY_DISTRICT_XPATH)
+
     en_names = list()
     ch_names = list()
     for element in elements:
@@ -45,9 +46,9 @@ def get_districts(city):
         ch_names.append(element.text)
 
         # 打印区县英文和中文名列表
-    for index, name in enumerate(en_names):
-        chinese_city_district_dict[name] = ch_names[index]
-        # print(name + ' -> ' + ch_names[index])
+    for index, en_name in enumerate(en_names):
+        chinese_city_district_dict[en_name] = ch_names[index]
+    print(chinese_city_district_dict)
     return en_names
 
 

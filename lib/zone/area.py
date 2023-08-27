@@ -28,7 +28,7 @@ def get_areas(city, district):
     :return: 区县列表
     """
     page = get_district_url(city, district)
-    areas = list()
+    en_areas = list()
     try:
         headers = create_headers()
         response = requests.get(page, timeout=10, headers=headers)
@@ -42,14 +42,14 @@ def get_areas(city, district):
             # 去掉最后的"/"
             relative_link = relative_link[:-1]
             # 获取最后一节
-            area = relative_link.split("/")[-1]
+            en_area = relative_link.split("/")[-1]
             # 去掉区县名,防止重复
-            if area != district:
+            if en_area != district:
                 chinese_area = link.text
-                chinese_area_dict[area] = chinese_area
+                chinese_area_dict[en_area] = chinese_area
                 # print(chinese_area)
-                areas.append(area)
-        return areas
+                en_areas.append(en_area)
+        return en_areas
     except Exception as e:
         print(e)
 
