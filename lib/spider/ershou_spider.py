@@ -40,7 +40,7 @@ class ErShouSpider(BaseSpider):
             if fmt == "csv":
                 for ershou in ershous:
                     # print(date_string + "," + xiaoqu.text())
-                    f.write(self.date_string + "," + ershou.text() + "\n")
+                    f.write(self.date_string + "," + ershou.text())
         print("Finish crawl area: " + area_name + ", save data to : " + csv_file)
 
     @staticmethod
@@ -123,7 +123,8 @@ class ErShouSpider(BaseSpider):
 
 
                 # 作为对象保存
-                ershou = ErShou(chinese_district, chinese_area, title_text, total_price_text, desc_text, pic_url)
+                ershou = ErShou(chinese_district, chinese_area, title_text,
+                                unit_price_text, total_price_text, position_text, desc_text, pic_url)
                 ershou_list.append(ershou)
         return ershou_list
 
