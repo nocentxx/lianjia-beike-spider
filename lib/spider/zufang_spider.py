@@ -26,8 +26,8 @@ class ZuFangBaseSpider(BaseSpider):
         :param fmt: 保存文件格式
         :return: None
         """
-        district_name = area_dict.get(area_name, "")
-        csv_file = self.today_path + "/{0}_{1}.csv".format(district_name, area_name)
+        district_pinyin_name = area_district_pinyin_name_dict.get(area_name, "")
+        csv_file = self.today_path + "/{0}_{1}.csv".format(district_pinyin_name, area_name)
         with open(csv_file, "w") as f:
             # 开始获得需要的板块数据
             zufangs = self.get_area_zufang_info(city_name, area_name)
@@ -51,9 +51,9 @@ class ZuFangBaseSpider(BaseSpider):
         :return: 出租房信息列表
         """
         total_page = 1
-        district_name = area_dict.get(area_name, "")
-        chinese_district = get_chinese_district(district_name)
-        chinese_area = chinese_area_dict.get(area_name, "")
+        district_pinyin_name = area_district_pinyin_name_dict.get(area_name, "")
+        chinese_district = get_chinese_district(district_pinyin_name)
+        chinese_area = area_pinyin_cn_name_dict.get(area_name, "")
         zufang_list = list()
         page = 'http://{0}.{1}.com/zufang/{2}/'.format(city_name, SPIDER_NAME, area_name)
         print(page)
@@ -166,9 +166,9 @@ class ZuFangBaseSpider(BaseSpider):
             areas.extend(areas_of_district)
             # 使用一个字典来存储区县和板块的对应关系, 例如{'beicai': 'pudongxinqu', }
             for area in areas_of_district:
-                area_dict[area] = district
+                area_district_pinyin_name_dict[area] = district
         print("Area:", areas)
-        print("District and areas:", area_dict)
+        print("District and areas:", area_district_pinyin_name_dict)
 
         # 准备线程池用到的参数
         nones = [None for i in range(len(areas))]

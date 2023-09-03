@@ -11,18 +11,18 @@ from lib.const.xpath import *
 from lib.request.headers import *
 from lib.spider.base_spider import SPIDER_NAME
 
-chinese_city_district_dict = dict()     # 城市代码和中文名映射
-chinese_area_dict = dict()              # 版块代码和中文名映射
-area_dict = dict()
+district_pinyin_cn_name_dict = dict()     # 城市代码和中文名映射
+area_pinyin_cn_name_dict = dict()              # 版块代码和中文名映射
+area_district_pinyin_name_dict = dict()
 
 
-def get_chinese_district(en):
+def get_district_cn_name(en):
     """
     拼音区县名转中文区县名
     :param en: 英文
     :return: 中文
     """
-    return chinese_city_district_dict.get(en, None)
+    return district_pinyin_cn_name_dict.get(en, None)
 
 
 def get_districts(city):
@@ -38,24 +38,24 @@ def get_districts(city):
     root = etree.HTML(html)
     elements = root.xpath(CITY_DISTRICT_XPATH)
 
-    en_names = list()
+    pinyin_names = list()
     ch_names = list()
     for element in elements:
         link = element.attrib['href']
-        en_names.append(link.split('/')[-2])
+        pinyin_names.append(link.split('/')[-2])
         ch_names.append(element.text)
 
         # 打印区县英文和中文名列表
-    for index, en_name in enumerate(en_names):
-        chinese_city_district_dict[en_name] = ch_names[index]
-    print(chinese_city_district_dict)
-    return en_names
+    for index, pinyin_name in enumerate(pinyin_names):
+        district_pinyin_cn_name_dict[pinyin_name] = ch_names[index]
+    print(district_pinyin_cn_name_dict)
+    return pinyin_names
 
 
 if __name__ == '__main__':
     for key in cities.keys():
         # 寻找那些网页格式不合规的城市
-        chinese_city_district_dict = dict()
+        district_pinyin_cn_name_dict = dict()
         get_districts(key)
-        if len(chinese_city_district_dict.items()) == 0:
+        if len(district_pinyin_cn_name_dict.items()) == 0:
             print(key)

@@ -18,48 +18,60 @@ import lib.utility.version
 
 
 class ErShouSpider(BaseSpider):
-    def collect_area_ershou_data(self, city_name, area_name, fmt="csv"):
+    def __init__(self, spider_name):
+        super(ErShouSpider, self).__init__(spider_name)
+        #self.ershou_analyzer = ErShouAnalyzer()
+
+    def collect_area_ershou_data(self, city_pinyin_name, area_pinyin_name, fmt="csv"):
         """
         对于每个板块,获得这个板块下所有二手房的信息
         并且将这些信息写入文件保存
-        :param city_name: 城市
-        :param area_name: 板块
+        :param city_pinyin_name: 城市
+        :param area_pinyin_name: 板块
         :param fmt: 保存文件格式
         :return: None
         """
-        district_name = area_dict.get(area_name, "")
-        csv_file = self.today_path + "/{0}_{1}.csv".format(district_name, area_name)
+        district_pinyin_name = area_district_pinyin_name_dict.get(area_pinyin_name, "")
+        csv_file = self.today_path + "/{0}_{1}.csv".format(district_pinyin_name, area_pinyin_name)
+        ershous = self.get_area_ershou_info(self.date_string, city_pinyin_name, area_pinyin_name)
+        if len(ershous) == 0:
+            print("{0}-{1} 没有在售住宅".format(district_pinyin_cn_name_dict, area_pinyin_cn_name_dict))
+            return
+
         with open(csv_file, "w") as f:
             # 开始获得需要的板块数据
-            ershous = self.get_area_ershou_info(city_name, area_name)
             # 锁定，多线程读写
             if self.mutex.acquire(1):
                 self.total_num += len(ershous)
+                #self.ershou_analyzer.add_area_houses_info_to_dict(distrcit_pinyin_name,
+                #                                                  area_pinyin_name,
+                #                                                  ershous)
                 # 释放
                 self.mutex.release()
             if fmt == "csv":
+                f.write(ErShou.excel_title) # write first row(title) of csv file
                 for ershou in ershous:
                     # print(date_string + "," + xiaoqu.text())
-                    f.write(self.date_string + "," + ershou.text())
-        print("Finish crawl area: " + area_name + ", save data to : " + csv_file)
+                    f.write(ershou.text())
+        print("Finish crawl area: " + area_pinyin_name + ", save data to : " + csv_file)
 
     @staticmethod
-    def get_area_ershou_info(city_name, area_name):
+    def get_area_ershou_info(date_string, city_pinyin_name, area_pinyin_name):
         """
         通过爬取页面获得城市指定版块的二手房信息
-        :param city_name: 城市
-        :param area_name: 版块
+        :param city_pinyin_name: 城市
+        :param area_pinyin_name: 版块
         :return: 二手房数据列表
         """
         total_page = 1
-        district_name = area_dict.get(area_name, "")
+        district_pinyin_name = area_district_pinyin_name_dict.get(area_pinyin_name, "")
         # 中文区县
-        chinese_district = get_chinese_district(district_name)
+        district_cn_name = get_district_cn_name(district_pinyin_name)
         # 中文版块
-        chinese_area = chinese_area_dict.get(area_name, "")
+        area_cn_name = area_pinyin_cn_name_dict.get(area_pinyin_name, "")
 
         ershou_list = list()
-        page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_name, SPIDER_NAME, area_name)
+        page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_pinyin_name, SPIDER_NAME, area_pinyin_name)
         print(page)  # 打印版块页面地址
         headers = create_headers()
         response = requests.get(page, timeout=50, headers=headers)
@@ -72,15 +84,15 @@ class ErShouSpider(BaseSpider):
             page_box = soup.find_all('div', class_=page_box_class)
             matches = re.search('.*"totalPage":(\d+),.*', str(page_box))
             total_page = int(matches.group(1))
-            print("{0}.total_page: {1}".format(area_name, total_page))
+            print("{0}.total_page: {1}".format(area_pinyin_name, total_page))
         except Exception as e:
-            print("\tWarning: only find one page for {0}".format(area_name))
+            print("\tWarning: only find one page for {0}".format(area_pinyin_name))
             print(e)
 
 
         # 从第一页开始,一直遍历到最后一页
         for num in range(1, total_page + 1):
-            page = 'http://{0}.{1}.com/ershoufang/{2}/pg{3}'.format(city_name, SPIDER_NAME, area_name, num)
+            page = 'http://{0}.{1}.com/ershoufang/{2}/pg{3}'.format(city_pinyin_name, SPIDER_NAME, area_pinyin_name, num)
             print(page)  # 打印每一页的地址
             headers = create_headers()
             BaseSpider.random_delay()
@@ -114,16 +126,17 @@ class ErShouSpider(BaseSpider):
                 #print(unit_price.text)
                 #print(desc.text)
                 #print(pic.get('data-original'))
-                title_text = title.text.replace("\n", "")
-                position_text = position.text.replace("\n", "")
-                total_price_text = total_price.text.strip()
-                unit_price_text = unit_price.text.strip()
-                desc_text = desc.text.replace("\n", "").strip()
-                pic_url = pic.get('data-original').strip()
-
+                title_text = title.text.replace("\n", "").replace(",", "").strip()
+                position_text = position.text.replace("\n", "").replace(",", "").strip()
+                total_price_text = total_price.text.replace(",", "").replace("万", "").strip()
+                unit_price_text = unit_price.text.replace(",", "").replace("元/平","").strip()
+                desc_text = desc.text.replace("\n", "").replace(",", "").strip()
+                pic_url = pic.get('data-original').replace(",", "").strip()
+                if len(pic_url) == 0:
+                    pic_url = "no pic url"
 
                 # 作为对象保存
-                ershou = ErShou(chinese_district, chinese_area, title_text,
+                ershou = ErShou(date_string, district_cn_name, area_cn_name, title_text,
                                 unit_price_text, total_price_text, position_text, desc_text, pic_url)
                 ershou_list.append(ershou)
         return ershou_list
@@ -135,27 +148,27 @@ class ErShouSpider(BaseSpider):
         t1 = time.time()  # 开始计时
 
         # 获得城市有多少区列表, district: 区县
-        districts = get_districts(city)
+        districts_pinyin_names = get_districts(city)
         print('City: {0}'.format(city))
-        print('Districts: {0}'.format(districts))
+        print('districts_pinyin_names: {0}'.format(districts_pinyin_names))
 
         # 获得每个区的板块, area: 板块
-        areas = list()
-        for district in districts:
-            areas_of_district = get_areas(city, district)
-            print('{0}: Area list:  {1}'.format(district, areas_of_district))
+        area_pinyin_names_list = list()
+        for district_pinyin_name in districts_pinyin_names:
+            area_pinyin_names_of_district = get_areas(city, district_pinyin_name)
+            print('{0}: Area list:  {1}'.format(district_pinyin_name, area_pinyin_names_of_district))
             # 用list的extend方法,L1.extend(L2)，该方法将参数L2的全部元素添加到L1的尾部
-            areas.extend(areas_of_district)
+            area_pinyin_names_list.extend(area_pinyin_names_of_district)
             # 使用一个字典来存储区县和板块的对应关系, 例如{'beicai': 'pudongxinqu', }
-            for area in areas_of_district:
-                area_dict[area] = district
-        print("Area:", areas)
-        print("District and areas:", area_dict)
+            for area_pinyin_name in area_pinyin_names_of_district:
+                area_district_pinyin_name_dict[area_pinyin_name] = district_pinyin_name
+        print("Area:", area_pinyin_names_list)
+        print("District and areas:", area_district_pinyin_name_dict)
 
         # 准备线程池用到的参数
-        nones = [None for i in range(len(areas))]
-        city_list = [city for i in range(len(areas))]
-        args = zip(zip(city_list, areas), nones)
+        nones = [None for i in range(len(area_pinyin_names_list))]
+        city_list = [city for i in range(len(area_pinyin_names_list))]
+        args = zip(zip(city_list, area_pinyin_names_list), nones)
 
         # 针对每个板块写一个文件,启动一个线程来操作
         pool_size = thread_pool_size
@@ -167,7 +180,7 @@ class ErShouSpider(BaseSpider):
 
         # 计时结束，统计结果
         t2 = time.time()
-        print("Total crawl {0} areas.".format(len(areas)))
+        print("Total crawl {0} areas.".format(len(area_pinyin_names_list)))
         print("Total cost {0} second to crawl {1} data items.".format(t2 - t1, self.total_num))
 
 
