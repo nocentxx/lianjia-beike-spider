@@ -7,7 +7,7 @@
 
 import os
 import time
-from lib.zone.city import get_chinese_city
+from lib.zone.city import get_city_cn_name
 from lib.request.headers import create_headers
 from lib.utility.date import get_date_string
 from lib.spider.base_spider import SPIDER_NAME
@@ -31,7 +31,7 @@ def get_ershou_img_urls(city):
         print("Bye.")
         exit(0)
     else:
-        print('OK, start to process ' + get_chinese_city(city))
+        print('OK, start to process ' + get_city_cn_name(city))
     for csv in os.listdir(csv_dir):
         if csv[-3:] != "csv":
             continue

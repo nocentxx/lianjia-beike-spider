@@ -7,6 +7,7 @@
 import re
 import threadpool
 from bs4 import BeautifulSoup
+from lib.analyzer.ershou_analyzer import *
 from lib.item.ershou import *
 from lib.zone.city import get_city
 from lib.spider.base_spider import *
@@ -20,7 +21,7 @@ import lib.utility.version
 class ErShouSpider(BaseSpider):
     def __init__(self, spider_name):
         super(ErShouSpider, self).__init__(spider_name)
-        #self.ershou_analyzer = ErShouAnalyzer()
+        self.ershou_analyzer = ErShouAnalyzer()
 
     def collect_area_ershou_data(self, city_pinyin_name, area_pinyin_name, fmt="csv"):
         """
@@ -143,7 +144,9 @@ class ErShouSpider(BaseSpider):
 
     def start(self):
         city = get_city()
+        self.city_pinyin_name = city
         self.today_path = create_date_path("{0}/ershou".format(SPIDER_NAME), city, self.date_string)
+        self.ershou_analyzer.set_base_info(self.today_path, self.city_pinyin_name)
 
         t1 = time.time()  # 开始计时
 
@@ -182,6 +185,8 @@ class ErShouSpider(BaseSpider):
         t2 = time.time()
         print("Total crawl {0} areas.".format(len(area_pinyin_names_list)))
         print("Total cost {0} second to crawl {1} data items.".format(t2 - t1, self.total_num))
+
+        self.ershou_analyzer.data_analyzer()
 
 
 if __name__ == '__main__':

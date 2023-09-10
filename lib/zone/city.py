@@ -58,13 +58,13 @@ def create_prompt_text():
     return 'Which city do you want to crawl?\n' + ''.join(city_info)
 
 
-def get_chinese_city(en):
+def get_city_cn_name(city_pinyin_name):
     """
     拼音拼音名转中文城市名
     :param en: 拼音
     :return: 中文
     """
-    return cities.get(en, None)
+    return cities.get(city_pinyin_name, None)
 
 
 def get_city():
@@ -86,9 +86,9 @@ def get_city():
         print("At most accept one parameter.")
         exit(1)
 
-    chinese_city = get_chinese_city(city)
-    if chinese_city is not None:
-        message = 'OK, start to crawl ' + get_chinese_city(city)
+    city_cn_name = get_city_cn_name(city)
+    if city_cn_name is not None:
+        message = 'OK, start to crawl ' + get_city_cn_name(city)
         print(message)
         logger.info(message)
     else:
@@ -98,4 +98,4 @@ def get_city():
 
 
 if __name__ == '__main__':
-    print(get_chinese_city("sh"))
+    print(get_city_cn_name("sh"))

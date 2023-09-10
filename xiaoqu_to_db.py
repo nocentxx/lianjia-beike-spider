@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # 获得 csv 文件路径
     # date = "20180331"   # 指定采集数据的日期
     # city = "sh"         # 指定采集数据的城市
-    city_ch = get_chinese_city(city)
+    city_ch = get_city_cn_name(city)
     csv_dir = "{0}/{1}/xiaoqu/{2}/{3}".format(DATA_PATH, SPIDER_NAME, city, date)
 
     files = list()
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         print("Bye.")
         exit(0)
     else:
-        print('OK, start to process ' + get_chinese_city(city))
+        print('OK, start to process ' + get_city_cn_name(city))
     for csv in os.listdir(csv_dir):
         data_csv = csv_dir + "/" + csv
         # print(data_csv)
