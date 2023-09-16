@@ -39,11 +39,10 @@ class ErShouAnalyzer(object):
     def __init__(self):
         if __name__ != "__main__":
             self.city_pinyin_name = None
-            self.today_path = None
         else:
             self.city_pinyin_name = "sh"
-            self.today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + "sh/20230910"
 
+        self.today_path = None
         self.district_areas_house_info_dict = dict()
         self.summary_list = list()
 
@@ -166,6 +165,7 @@ class ErShouAnalyzer(object):
         by_avrg_sum = 0
 
         csv_file = self.today_path + "/{0}_summary.csv".format(self.city_pinyin_name)
+        print(csv_file)
 
         with open(csv_file, "w") as f:
             f.write(AreaErShou.summary_title) # write first row(title) of csv file
@@ -202,24 +202,25 @@ if __name__ == "__main__":
     from lib.zone.area import *
     import csv
 
-    city = 'sh'
-    districts_pinyin_names = get_districts(city)
+    city_pinyin_name = 'sh'
+    districts_pinyin_names = get_districts(city_pinyin_name)
     for district_pinyin_name in districts_pinyin_names:
-        area_pinyin_names_of_district = get_areas(city, district_pinyin_name)
+        area_pinyin_names_of_district = get_areas(city_pinyin_name, district_pinyin_name)
 
-    csv_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + "sh/20230903"
-    print("csv data path: ", csv_path)
+    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20230916"
+    print("today csv data path: ", today_path)
 
-    csv_lists = os.listdir(csv_path)
+    csv_lists = os.listdir(today_path)
 
     ershou_analyzer = ErShouAnalyzer()
+    ershou_analyzer.set_base_info(today_path, city_pinyin_name)
     for csv_file in csv_lists:
-        if csv_file == city + "_summary.csv":
+        if csv_file == city_pinyin_name + "_summary.csv":
             continue
 
         district_pinyin_name, area_pinyin_name = csv_file.replace(".csv", '').split(sep='_')
 
-        with open(csv_path + "/" + csv_file, encoding='utf-8') as f:
+        with open(today_path + "/" + csv_file, encoding='utf-8') as f:
             ershou_houses_list = list(csv.reader(f, skipinitialspace=True))
             ershou_analyzer.add_area_houses_info_to_dict(district_pinyin_name,
                                                          area_pinyin_name,
