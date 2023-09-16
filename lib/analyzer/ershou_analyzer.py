@@ -207,7 +207,7 @@ if __name__ == "__main__":
     for district_pinyin_name in districts_pinyin_names:
         area_pinyin_names_of_district = get_areas(city_pinyin_name, district_pinyin_name)
 
-    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20230916"
+    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20230910"
     print("today csv data path: ", today_path)
 
     csv_lists = os.listdir(today_path)
