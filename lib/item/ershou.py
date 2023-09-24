@@ -40,6 +40,26 @@ class ErShou(object):
         self.built_year = "未知"
         self.struct = "未知"
 
+    def set_value(self, date, district, area, title,
+                  unit_price, total_price, position, huxing,
+                  mianji, chaoxiang, zhuangxiu, floor,
+                  built_year, struct, pic_url):
+        self.date  = date
+        self.district  = district
+        self.area  = area
+        self.title  = title
+        self.unit_price  = unit_price
+        self.total_price  = total_price
+        self.position  = position
+        self.huxing  = huxing
+        self.mianji  = mianji
+        self.chaoxiang  = chaoxiang
+        self.zhuangxiu  = zhuangxiu
+        self.floor  = floor
+        self.built_year  = built_year
+        self.struct  = struct
+        self.pic_url = pic_url
+
     def desc_handler(self):
         #['1室1厅 ', ' 35.8平米 ', ' 南 ', ' 毛坯 ', ' 低楼层(共6层) ', ' 1996年建 ', ' 板楼']
         desc_list = self.desc.split(sep="|")

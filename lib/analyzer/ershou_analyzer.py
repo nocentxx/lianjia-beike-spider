@@ -4,6 +4,7 @@ import numpy as np
 
 if __name__ != "__main__":
     from lib.zone.district import *
+    from lib.item.ershou import *
 
 class AreaErShou(object):
     summary_title =  "日期," + \
@@ -37,11 +38,7 @@ class AreaErShou(object):
 
 class ErShouAnalyzer(object):
     def __init__(self):
-        if __name__ != "__main__":
-            self.city_pinyin_name = None
-        else:
-            self.city_pinyin_name = "sh"
-
+        self.city_pinyin_name = None
         self.today_path = None
         self.district_areas_house_info_dict = dict()
         self.summary_list = list()
@@ -77,54 +74,29 @@ class ErShouAnalyzer(object):
 
         for i in range(1, len(ershous_list)):
             ershou_item = ershous_list[i]
-            if __name__ != "__main__":
-                try:
-                    unit_price += float(ershou_item.unit_price)
-                    unit_price_num += 1
-                except ValueError as e:
-                    print(f"unit_price conversion: {e}")
+            try:
+                unit_price += float(ershou_item.unit_price)
+                unit_price_num += 1
+            except ValueError as e:
+                print(f"unit_price conversion: {e}")
 
-                try:
-                    total_price += float(ershou_item.total_price)
-                    total_price_num +=1
-                except ValueError as e:
-                    print(f"tatal_price conversion: {e}")
+            try:
+                total_price += float(ershou_item.total_price)
+                total_price_num +=1
+            except ValueError as e:
+                print(f"tatal_price conversion: {e}")
 
-                try:
-                    mianji += float(ershou_item.mianji)
-                    mianji_num +=1
-                except ValueError as e:
-                    print(f"mianji conversion: {e}")
+            try:
+                mianji += float(ershou_item.mianji)
+                mianji_num +=1
+            except ValueError as e:
+                print(f"mianji conversion: {e}")
 
-                try:
-                    year += float(ershou_item.built_year)
-                    year_num +=1
-                except ValueError as e:
-                    print(f"built_year conversion: {e}")
-            else:
-                try:
-                    unit_price += float(ershou_item[4])
-                    unit_price_num += 1
-                except ValueError as e:
-                    print(f"unit_price conversion: {e}")
-
-                try:
-                    total_price += float(ershou_item[5])
-                    total_price_num +=1
-                except ValueError as e:
-                    print(f"tatal_price conversion: {e}")
-
-                try:
-                    mianji += float(ershou_item[8])
-                    mianji_num +=1
-                except ValueError as e:
-                    print(f"mianji conversion: {e}")
-
-                try:
-                    year += float(ershou_item[12])
-                    year_num +=1
-                except ValueError as e:
-                    print(f"built_year conversion: {e}")
+            try:
+                year += float(ershou_item.built_year)
+                year_num +=1
+            except ValueError as e:
+                print(f"built_year conversion: {e}")
 
         average_up = 0
         average_tp = 0
@@ -141,10 +113,7 @@ class ErShouAnalyzer(object):
             average_by = year/year_num
 
         print("average: ", average_up, average_tp, average_mj, average_by)
-        if __name__ != "__main__":
-            return AreaErShou(ershou_item.date, ershou_item.district, ershou_item.area, unit_price_num, average_up, average_tp, average_mj, average_by)
-        else:
-            return AreaErShou(ershou_item[0], ershou_item[1], ershou_item[2], unit_price_num, average_up, average_tp, average_mj, average_by)
+        return AreaErShou(ershous_list[0].date, ershous_list[0].district, ershous_list[0].area, unit_price_num, average_up, average_tp, average_mj, average_by)
 
     def data_analyzer(self):
         for k, v in self.district_areas_house_info_dict.items():
@@ -192,6 +161,7 @@ class ErShouAnalyzer(object):
                     str(by_avrg_sum_avrg) + "\n")
 
 
+
 if __name__ == "__main__":
     lib_path=os.path.dirname(sys.path[0])
     root_path = os.path.dirname(lib_path)
@@ -200,14 +170,34 @@ if __name__ == "__main__":
     from lib.utility import path
     from lib.spider.base_spider import SPIDER_NAME
     from lib.zone.area import *
+    from lib.item.ershou import *
     import csv
+
+    def csv_item_to_ershou_item_list(csv_item_list):
+        ershou_list = list()
+
+        for i in range(1, len(csv_item_list)):
+            ershou_item = csv_item_list[i]
+                # 作为对象保存
+            ershou = ErShou(ershou_item[0], ershou_item[1], ershou_item[2], ershou_item[3],
+                            ershou_item[4], ershou_item[5], ershou_item[6], ershou_item[7],
+                            ershou_item[8])
+
+            ershou.set_value(ershou_item[0], ershou_item[1], ershou_item[2], ershou_item[3],
+                            ershou_item[4], ershou_item[5], ershou_item[6], ershou_item[7],
+                            ershou_item[8], ershou_item[9], ershou_item[10], ershou_item[11],
+                            ershou_item[12], ershou_item[13], ershou_item[14])
+
+            ershou_list.append(ershou)
+
+        return ershou_list
 
     city_pinyin_name = 'sh'
     districts_pinyin_names = get_districts(city_pinyin_name)
     for district_pinyin_name in districts_pinyin_names:
         area_pinyin_names_of_district = get_areas(city_pinyin_name, district_pinyin_name)
 
-    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20230910"
+    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20230924"
     print("today csv data path: ", today_path)
 
     csv_lists = os.listdir(today_path)
@@ -221,7 +211,8 @@ if __name__ == "__main__":
         district_pinyin_name, area_pinyin_name = csv_file.replace(".csv", '').split(sep='_')
 
         with open(today_path + "/" + csv_file, encoding='utf-8') as f:
-            ershou_houses_list = list(csv.reader(f, skipinitialspace=True))
+            csv_item_list = list(csv.reader(f, skipinitialspace=True))
+            ershou_houses_list = csv_item_to_ershou_item_list(csv_item_list)
             ershou_analyzer.add_area_houses_info_to_dict(district_pinyin_name,
                                                          area_pinyin_name,
                                                          ershou_houses_list)

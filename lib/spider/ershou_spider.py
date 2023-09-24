@@ -44,7 +44,7 @@ class ErShouSpider(BaseSpider):
             # 锁定，多线程读写
             if self.mutex.acquire(1):
                 self.total_num += len(ershous)
-                self.ershou_analyzer.add_area_houses_info_to_dict(distrcit_pinyin_name,
+                self.ershou_analyzer.add_area_houses_info_to_dict(district_pinyin_name,
                                                                   area_pinyin_name,
                                                                   ershous)
                 # 释放
