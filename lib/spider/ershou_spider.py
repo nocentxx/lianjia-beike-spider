@@ -146,7 +146,8 @@ class ErShouSpider(BaseSpider):
         city = get_city()
         self.city_pinyin_name = city
         self.today_path = create_date_path("{0}/ershou".format(SPIDER_NAME), city, self.date_string)
-        self.ershou_analyzer.set_base_info(self.today_path, self.city_pinyin_name)
+        self.summary_path = create_summary_path("{0}/ershou".format(SPIDER_NAME), city)
+        self.ershou_analyzer.set_base_info(self.city_pinyin_name, self.summary_path)
 
         t1 = time.time()  # 开始计时
 

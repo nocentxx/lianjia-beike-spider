@@ -50,6 +50,14 @@ def create_date_path(site, city, date):
     return date_path
 
 
+def create_summary_path(site, city):
+    city_path = create_city_path(site, city)
+    summary_path = city_path + "/summary"
+    if not os.path.exists(summary_path):
+        os.makedirs(summary_path)
+    return summary_path
+
+
 # const for path
 ROOT_PATH = get_root_path()
 DATA_PATH = ROOT_PATH + "/data"
