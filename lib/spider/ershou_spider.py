@@ -97,7 +97,7 @@ class ErShouSpider(BaseSpider):
             print(page)  # 打印每一页的地址
             headers = create_headers()
             BaseSpider.random_delay()
-            response = requests.get(page, timeout=10, headers=headers)
+            response = requests.get(page, timeout=20, headers=headers)
             html = response.content
             soup = BeautifulSoup(html, "lxml")
             #print("debug soup: ", soup)
