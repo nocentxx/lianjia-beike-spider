@@ -144,6 +144,7 @@ class ErShouAnalyzer(object):
             mj_avrg_sum += summary_item.mianji_avrg
             by_avrg_sum += summary_item.by_avrg
 
+            # district scope summary
             area_csv_file = self.summary_path + "/{0}_{1}_summary.csv".format(summary_item.district, summary_item.area)
             print(area_csv_file)
 
@@ -154,6 +155,7 @@ class ErShouAnalyzer(object):
             with open(area_csv_file, "a") as f:
                 f.write(summary_item.text())
 
+        # city scope summary
         csv_file = self.summary_path + "/{0}_summary.csv".format(self.city_pinyin_name)
         print(csv_file)
         if not os.path.isfile(csv_file):
@@ -207,12 +209,12 @@ if __name__ == "__main__":
 
         return ershou_list
 
-    city_pinyin_name = 'su'
+    city_pinyin_name = 'sh'
     districts_pinyin_names = get_districts(city_pinyin_name)
     for district_pinyin_name in districts_pinyin_names:
         area_pinyin_names_of_district = get_areas(city_pinyin_name, district_pinyin_name)
 
-    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20231015"
+    today_path = path.DATA_PATH + "/" + SPIDER_NAME + "/ershou/" + city_pinyin_name + "/20231104"
     summary_path = path.create_summary_path("{0}/ershou".format(SPIDER_NAME), city_pinyin_name)
     print("today_path: ", today_path)
 

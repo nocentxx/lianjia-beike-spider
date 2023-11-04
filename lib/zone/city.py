@@ -8,6 +8,7 @@
 
 import os
 import random
+import re
 import requests
 import sys
 
@@ -17,29 +18,30 @@ if __name__ != "__main__":
     from lib.utility.version import PYTHON_3
     from lib.utility.log import *
 
-cities = {
-    'bj': '北京',
-    'cd': '成都',
-    'cq': '重庆',
-    'cs': '长沙',
-    'dg': '东莞',
-    'dl': '大连',
-    'fs': '佛山',
-    'gz': '广州',
-    'hz': '杭州',
-    'hf': '合肥',
-    'jn': '济南',
-    'nj': '南京',
-    'qd': '青岛',
-    'sh': '上海',
-    'sz': '深圳',
-    'su': '苏州',
-    'sy': '沈阳',
-    'tj': '天津',
-    'wh': '武汉',
-    'xm': '厦门',
-    'yt': '烟台',
-}
+cities = dict()
+#cities = {
+#    'bj': '北京',
+#    'cd': '成都',
+#    'cq': '重庆',
+#    'cs': '长沙',
+#    'dg': '东莞',
+#    'dl': '大连',
+#    'fs': '佛山',
+#    'gz': '广州',
+#    'hz': '杭州',
+#    'hf': '合肥',
+#    'jn': '济南',
+#    'nj': '南京',
+#    'qd': '青岛',
+#    'sh': '上海',
+#    'sz': '深圳',
+#    'su': '苏州',
+#    'sy': '沈阳',
+#    'tj': '天津',
+#    'wh': '武汉',
+#    'xm': '厦门',
+#    'yt': '烟台',
+#}
 
 
 lianjia_cities = cities
@@ -99,10 +101,20 @@ def crawl_cities():
         logger.info(province_name)
 
         city_list = province_item.find_all('a')
+
+        pattern = re.compile('(fang)|(you).lianjia.com/')
+
         for city_item in city_list:
-            abbr_url = city_item.get('href')
-            city_abbr = abbr_url.replace('https://', '').replace('.lianjia.com/', '')
             city_name = city_item.text
+            abbr_url = city_item.get('href')
+            ret = pattern.search(abbr_url)
+            if ret is not None:
+                print("ignore city: ", city_name, abbr_url)
+                continue
+            else:
+                city_abbr = re.sub('http.*://', '', abbr_url).replace('.lianjia.com/', '')
+
+            cities[city_abbr] = city_name
 
             logger.info(city_abbr)
             logger.info(city_name)
@@ -113,6 +125,7 @@ def create_prompt_text():
     根据已有城市中英文对照表拼接选择提示信息
     :return: 拼接好的字串
     """
+    crawl_cities()
     city_info = list()
     count = 0
     for en_name, ch_name in cities.items():
@@ -142,7 +155,7 @@ def get_city():
     if len(sys.argv) < 2:
         print("Wait for your choice.")
         # 让用户选择爬取哪个城市的二手房小区价格数据
-        prompt = create_prompt_text()
+        prompt = create_prompt_text() + "\n"
         # 判断Python版本
         if not PYTHON_3:  # 如果小于Python3
             city = raw_input(prompt)

@@ -5,6 +5,7 @@
 # 二手房信息的数据结构
 import re
 
+
 class ErShou(object):
     excel_title =  "日期," + \
                 "区," + \
@@ -62,7 +63,8 @@ class ErShou(object):
 
     def desc_handler(self):
         #['1室1厅 ', ' 35.8平米 ', ' 南 ', ' 毛坯 ', ' 低楼层(共6层) ', ' 1996年建 ', ' 板楼']
-        desc_list = self.desc.split(sep="|")
+        desc = re.sub('\s', '', self.desc)
+        desc_list = desc.split(sep="|")
         num = len(desc_list)
         if num >=7:
             self.huxing = desc_list[0].strip()
@@ -70,7 +72,8 @@ class ErShou(object):
             self.chaoxiang = desc_list[2].strip()
             self.zhuangxiu = desc_list[3].strip()
             self.floor = desc_list[4].strip()
-            self.built_year = desc_list[5].strip().replace("年建", "")
+            self.built_year = re.sub('年.*', '', desc_list[5])#desc_list[5].strip().replace("年建", "")
+
             if num == 7:
                 self.struct = desc_list[6].strip()
             else:
@@ -78,7 +81,7 @@ class ErShou(object):
         else:
             hx_pat = re.compile('\d{1,2}室\d{1,2}厅')
             cx_pat = re.compile('[东西南北]')
-            by_pat = re.compile('年建')
+            by_pat = re.compile('年.*')
             fl_pat = re.compile('层')
             zx_pat = re.compile('[精装简毛坯]')
             st_pat = re.compile('[塔楼板]')
@@ -98,7 +101,7 @@ class ErShou(object):
                 elif chaoxiang is not None:
                     self.chaoxiang = txt
                 elif builtyear is not None:
-                    self.built_year = txt.replace("年建", "")
+                    self.built_year = txt.split(sep="年")[0]
                 elif floor is not None:
                     self.floor = txt
                 elif zhuangxiu is not None:
