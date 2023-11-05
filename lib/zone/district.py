@@ -11,9 +11,9 @@ from lib.const.xpath import *
 from lib.request.headers import *
 from lib.spider.base_spider import SPIDER_NAME
 
-district_pinyin_cn_name_dict = dict()     # 城市代码和中文名映射
-area_pinyin_cn_name_dict = dict()              # 版块代码和中文名映射
-area_district_pinyin_name_dict = dict()
+district_pinyin_cn_name_dict = dict()     # 区pinyin和中文名映射
+area_pinyin_cn_name_dict = dict()              # 镇pinyin和中文名映射
+area_district_pinyin_name_dict = dict() # 镇-区映射
 
 
 def get_district_cn_name(en):

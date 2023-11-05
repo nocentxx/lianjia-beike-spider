@@ -58,6 +58,13 @@ def create_summary_path(site, city):
     return summary_path
 
 
+def create_area_path(base_path, district, area):
+    area_path = base_path + "/" + district + "/" + area
+    if not os.path.exists(area_path):
+        os.makedirs(area_path)
+    return area_path
+
+
 # const for path
 ROOT_PATH = get_root_path()
 DATA_PATH = ROOT_PATH + "/data"
