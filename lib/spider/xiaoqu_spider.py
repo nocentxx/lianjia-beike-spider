@@ -62,12 +62,13 @@ class XiaoQuBaseSpider(BaseSpider):
         html = response.content
         soup = BeautifulSoup(html, "lxml")
 
-        detailTitle = soup.find('h1', class_='detailTitle').text.strip()
+        detailTitle = soup.find('h1', class_='detailTitle').text.strip().replace(r'/', r'_')
 
+        xiaoqu_detail = list()
         # 小区详细信息
         detail_items = soup.find_all('div', class_='xiaoquDescribe fr')
         for detail_item in detail_items:
-            aver_price = detail_item.find('span', class_='noPrice').text
+            aver_price = detail_item.find('div', class_='fl').text
             info_item_list = detail_item.find_all('div', class_='xiaoquInfoItem')
 
             for info_item in info_item_list:
@@ -104,10 +105,16 @@ class XiaoQuBaseSpider(BaseSpider):
                 else:
                     print('error! unknown label: ', label)
 
-        #print("detail: ", trade_type, built_year, aver_price, building_type, \
-        #        house_total, building_total, greening_ratio, plot_ratio, \
-        #        water_type, elec_type, heating_type, subway_info, \
-        #        property_fee, property_company, real_estate, intermediary)
+        xiaoqu_detail.append(trade_type)
+        xiaoqu_detail.append(plot_ratio)
+        xiaoqu_detail.append(greening_ratio)
+        xiaoqu_detail.append(property_fee)
+        xiaoqu_detail.append(water_type)
+        xiaoqu_detail.append(elec_type)
+        print("detail: ", trade_type, built_year, aver_price, building_type, \
+                house_total, building_total, greening_ratio, plot_ratio, \
+                water_type, elec_type, heating_type, subway_info, \
+                property_fee, property_company, real_estate, intermediary)
 
         xiaoqu_csv_file = store_path + "/" + detailTitle + ".csv"
         if not os.path.isfile(xiaoqu_csv_file):
@@ -134,6 +141,8 @@ class XiaoQuBaseSpider(BaseSpider):
 
                     f.write(deal_frame.text())
                     #print(deal_frame.text())
+
+        return xiaoqu_detail
 
     @staticmethod
     def get_xiaoqu_info(city, area, store_path):
@@ -197,7 +206,7 @@ class XiaoQuBaseSpider(BaseSpider):
                 deal_of_90days = house_info[0].strip().replace("90天成交", "").replace("套", "")
                 on_rent_count = house_info[1].strip().replace("套正在出租", "")
 
-                price = house_elem.find('div', class_="totalPrice noPrice").text.replace("\n", "").strip()
+                price = house_elem.find('div', class_="totalPrice").text.replace("\n", "").strip()
                 on_sale_count = house_elem.find('div', class_="xiaoquListItemSellCount").text.replace("\n", "").replace("套在售二手房", "").strip()
                 subway_info = 'n/a'
                 try:
@@ -205,12 +214,14 @@ class XiaoQuBaseSpider(BaseSpider):
                 except Exception as e:
                     print("no subway info.")
 
-                XiaoQuBaseSpider.get_xiaoqu_detail(xq_url, subway_info, store_path) # 小区详细信息
+                detail_info = XiaoQuBaseSpider.get_xiaoqu_detail(xq_url, subway_info, store_path) # 小区详细信息
 
                 # 作为对象保存
-                xiaoqu = XiaoQu(district_cn_name, area_cn_name, xq_name, built_year, price, on_sale_count, deal_of_90days, on_rent_count, subway_info)
+                xiaoqu = XiaoQu(district_cn_name, area_cn_name, xq_name, built_year, price, on_sale_count, deal_of_90days, on_rent_count, subway_info, \
+                        detail_info[0], detail_info[1], detail_info[2], detail_info[3], detail_info[4], detail_info[5])
                 xiaoqu_list.append(xiaoqu)
         return xiaoqu_list
+
 
     def start(self):
         city = get_city()

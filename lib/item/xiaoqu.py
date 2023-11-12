@@ -6,10 +6,11 @@
 
 
 class XiaoQu(object):
-    xiaoqu_title = "日期,区,县,小区,建造年份,均价,在售数量,90天成交数量,在租数量,地铁信息\n"
+    xiaoqu_title = "日期,区,县,小区,建造年份,均价,在售数量,90天成交数量,在租数量,地铁信息,交易权属,容积率,绿化率,物业费,水,电\n"
 
     def __init__(self, district, area, xq_name, built_year, price, on_sale_count,
-                 deal_count_of_90days, on_rent_count, subway_info):
+                 deal_count_of_90days, on_rent_count, subway_info,
+                 trade_type, plot_ratio, greening_ratio, property_fee, water_type, elec_type):
         self.district = district
         self.area = area
         self.xq_name = xq_name
@@ -19,6 +20,12 @@ class XiaoQu(object):
         self.deal_count_of_90days = deal_count_of_90days
         self.on_rent_count = on_rent_count
         self.subway_info = subway_info
+        self.trade_type = trade_type
+        self.plot_ratio = plot_ratio
+        self.greening_ratio = greening_ratio
+        self.property_fee = property_fee
+        self.water_type = water_type
+        self.elec_type = elec_type
 
     def text(self):
         return self.district + "," + \
@@ -29,7 +36,13 @@ class XiaoQu(object):
                 self.on_sale_count + "," + \
                 self.deal_count_of_90days + "," + \
                 self.on_rent_count + "," + \
-                self.subway_info + '\n'
+                self.subway_info + "," + \
+                self.trade_type + "," + \
+                self.plot_ratio + "," + \
+                self.greening_ratio + "," + \
+                self.property_fee + "," + \
+                self.water_type + "," + \
+                self.elec_type + "\n"
 
 
 class DealFrame(object):
@@ -72,6 +85,7 @@ class DealFrame(object):
         self.detailTitle + "," + \
         self.trade_type + "," + \
         self.built_year + "," + \
+        self.aver_price + "," + \
         self.building_type + "," + \
         self.house_total + "," + \
         self.building_total + "," + \

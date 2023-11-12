@@ -33,7 +33,10 @@ class ErShouSpider(BaseSpider):
         :return: None
         """
         district_pinyin_name = area_district_pinyin_name_dict.get(area_pinyin_name, "")
-        csv_file = self.today_path + "/{0}_{1}.csv".format(district_pinyin_name, area_pinyin_name)
+        district_cn = district_pinyin_cn_name_dict[district_pinyin_name]
+        area_cn = area_pinyin_cn_name_dict[area_pinyin_name]
+
+        csv_file = self.today_path + "/{0}_{1}.csv".format(district_cm, area_cn)
         ershous = self.get_area_ershou_info(self.date_string, city_pinyin_name, area_pinyin_name)
         if len(ershous) == 0:
             print("{0}-{1} 没有在售住宅".format(district_pinyin_name, area_pinyin_name))
