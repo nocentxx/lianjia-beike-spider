@@ -45,6 +45,33 @@ class ShangHaiFangdi(object):
 
         return page_content
 
+    def get_sh_yesterday_sell(self):
+        #POST /oldhouse/getSHYesterdaySell.action?MmEwMD=4Btes6wob5ZKKkDwBbM7k01vFxy5wGaxJQnMJOrohYRZIR1HDgxldVE0Fl5NfjmgB6u.tYurEOc.HAsf1NKaY6NsUmEV9NSLCzzHnmO6gMrOBcEHrByq3ab4As0RvYQCvkq8ffyWuvuz3ieorbPknIyw6f4AW4cYzPPhF1AmdQcnupQy7G7IWQTj.hLs0EKgYMFWhf.c03_tFU0ZKorK_IHS_NUgEzDYwhZ7FIifcL6SIkWIzB9yQRjuWCbD6GIG2mIR.lTKjx8gFcQn7FEHQ8w6QJxMtPq.b1csyySHKyLq4Lg.l9NCXoQjGicCQtWhJddgGt9RYQ.Vwoh2srwwvH9RRjjwE57btzIYp7OQg567aHyuj7eZ3nLyHutSPVITa4KR HTTP/1.1
+        headers = dict()
+        #headers['Accept'] = 'application/json, text/javascript, */*; q=0.01'
+        #headers['Accept-Encoding'] = 'gzip, deflate'
+        #headers['Accept-Language'] = 'zh-CN,zh;q=0.9,en;q=0.8'
+        #headers['Connection'] = 'keep-alive'
+        #headers['Content-Length'] = '0'
+        headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
+        #headers['Cookie'] = 'www.fangdi.com_http_ic=www.fangdi.com.cn_80_RS; www.fangdi.com.cn=www.fangdi.com.cn_rs4; FSSBBIl1UgzbN7N80S=w6iZD4fRq4c4f8Tqc1fP1r9SkgSFDjwc6gi2Fbr3q8EQJe4B_MKtgYHvMDc.KtKO; www.fangdi.com_http_ic=www.fangdi.com.cn_80_RS; JSESSIONID1=RXyTVMSCkIOvN3AkVLFme7z_6B4jDSecQ1iFQE3Hg8nrKKy4XwOv!15736515; FSSBBIl1UgzbN7N80T=41TP9tP3pkkxf5yc3M9u0xzgz0DfjwHK_fJl_853ZLbOL9zASmCMEN6.zyrCKU_v3tW0eLW8d8e0gz752VNBPtKWGZKWaSXzm71aTpuS8s3XNx7B6XTR3vPaEwwFYmKQRXrNmtBINnL58qDwqaGhTBFmM9xqLMFFqeKgUenSBqoNPZn58ZxphYnnp6MwJdGoJq2Vy17gDkGeLfMXQWnJraws2YGx59lyjvk39oFMIo0juHLhE3WBzmwrWK5Yi_lUHv3bPqRfrnH1xZWKKhW8xbeYgsA2dRQxghfIFdF9.W1Kd8Z5pMIRk18MYJQDI2.YW4kQ'
+        #headers['DNT'] = '1'
+        #headers['Host'] = 'www.fangdi.com.cn'
+        #headers['Origin'] = 'http://www.fangdi.com.cn'
+        headers['Referer'] = 'http://www.fangdi.com.cn/old_house/old_house.html'
+        headers['User-Agent'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        headers['X-Requested-With'] = 'XMLHttpRequest'
+
+        params = dict()
+        params['MmEwMD'] = '4Btes6wob5ZKKkDwBbM7k01vFxy5wGaxJQnMJOrohYRZIR1HDgxldVE0Fl5NfjmgB6u.tYurEOc.HAsf1NKaY6NsUmEV9NSLCzzHnmO6gMrOBcEHrByq3ab4As0RvYQCvkq8ffyWuvuz3ieorbPknIyw6f4AW4cYzPPhF1AmdQcnupQy7G7IWQTj.hLs0EKgYMFWhf.c03_tFU0ZKorK_IHS_NUgEzDYwhZ7FIifcL6SIkWIzB9yQRjuWCbD6GIG2mIR.lTKjx8gFcQn7FEHQ8w6QJxMtPq.b1csyySHKyLq4Lg.l9NCXoQjGicCQtWhJddgGt9RYQ.Vwoh2srwwvH9RRjjwE57btzIYp7OQg567aHyuj7eZ3nLyHutSPVITa4KR'
+        #url = 'http://www.fangdi.com.cn/oldhouse/getSHYesterdaySell.action?MmEwMD=4Btes6wob5ZKKkDwBbM7k01vFxy5wGaxJQnMJOrohYRZIR1HDgxldVE0Fl5NfjmgB6u.tYurEOc.HAsf1NKaY6NsUmEV9NSLCzzHnmO6gMrOBcEHrByq3ab4As0RvYQCvkq8ffyWuvuz3ieorbPknIyw6f4AW4cYzPPhF1AmdQcnupQy7G7IWQTj.hLs0EKgYMFWhf.c03_tFU0ZKorK_IHS_NUgEzDYwhZ7FIifcL6SIkWIzB9yQRjuWCbD6GIG2mIR.lTKjx8gFcQn7FEHQ8w6QJxMtPq.b1csyySHKyLq4Lg.l9NCXoQjGicCQtWhJddgGt9RYQ.Vwoh2srwwvH9RRjjwE57btzIYp7OQg567aHyuj7eZ3nLyHutSPVITa4KR'
+        url = 'http://www.fangdi.com.cn/oldhouse/getSHYesterdaySell.action?'
+
+        response = requests.post(url=url, headers=headers)
+        print(response.url)
+        print(response.text)
+        print(response.status_code)
+
     def get_newhouse_info(self, filename):
         html = self.run_javascript(self.newhouse_page)
         soup = BeautifulSoup(html, "html.parser")
@@ -86,4 +113,5 @@ class ShangHaiFangdi(object):
 
 if __name__ == "__main__":
     fangdi = ShangHaiFangdi()
-    fangdi.get_newhouse_info("123")
+    fangdi.get_sh_yesterday_sell()
+    #fangdi.get_newhouse_info("123")

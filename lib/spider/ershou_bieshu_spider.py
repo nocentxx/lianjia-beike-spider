@@ -7,7 +7,7 @@
 import re
 import threadpool
 from bs4 import BeautifulSoup
-from lib.analyzer.ershou_analyzer import *
+from lib.analyzer.ershou_bieshu_analyzer import *
 from lib.item.ershou import *
 from lib.zone.city import get_city
 from lib.spider.base_spider import *
@@ -18,10 +18,23 @@ from lib.utility.log import *
 import lib.utility.version
 
 
-class ErShouSpider(BaseSpider):
-    def __init__(self, spider_name):
-        super(ErShouSpider, self).__init__(spider_name)
-        self.ershou_analyzer = ErShouAnalyzer()
+"""
+filter:
+用途：
+    sf1:普通住宅
+    sf2:商业类
+    sf3:别墅
+    sf4:四合院
+    sf5:车位
+    sf6:其他
+"""
+
+filter_string = "sf3"
+
+class ErShouBieshuSpider(BaseSpider):
+    def __init__(self, spider_name,):
+        super(ErShouBieshuSpider, self).__init__(spider_name)
+        self.ershou_analyzer = ErShouBeishuAnalyzer()
 
     def collect_area_ershou_data(self, city_pinyin_name, area_pinyin_name, fmt="csv"):
         """
@@ -38,7 +51,7 @@ class ErShouSpider(BaseSpider):
 
         csv_file = self.today_path + "/{0}_{1}.csv".format(district_cn, area_cn)
         ershous = self.get_area_ershou_info(self.date_string, city_pinyin_name, area_pinyin_name)
-        if len(ershous) == 0:
+        if ershous == None or len(ershous) == 0:
             print("{0}-{1} 没有在售住宅".format(district_pinyin_name, area_pinyin_name))
             return
 
@@ -75,7 +88,7 @@ class ErShouSpider(BaseSpider):
         area_cn_name = area_pinyin_cn_name_dict.get(area_pinyin_name, "")
 
         ershou_list = list()
-        page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_pinyin_name, SPIDER_NAME, area_pinyin_name)
+        page = 'http://{0}.{1}.com/ershoufang/{2}/{3}'.format(city_pinyin_name, SPIDER_NAME, area_pinyin_name, filter_string)
         print(page)  # 打印版块页面地址
         headers = create_headers()
         response = requests.get(page, timeout=50, headers=headers)
@@ -88,22 +101,24 @@ class ErShouSpider(BaseSpider):
             page_box = soup.find_all('div', class_=page_box_class)
             matches = re.search('.*"totalPage":(\d+),.*', str(page_box))
             total_page = int(matches.group(1))
-            print("{0}.total_page: {1}".format(area_pinyin_name, total_page))
+            print("{0} total_page: {1}".format(area_pinyin_name, total_page))
         except Exception as e:
-            print("\tWarning: only find one page for {0}".format(area_pinyin_name))
             print(e)
+            print("\tWarning: no page for {0}".format(area_pinyin_name))
+            return
 
 
         # 从第一页开始,一直遍历到最后一页
         for num in range(1, total_page + 1):
-            page = 'http://{0}.{1}.com/ershoufang/{2}/pg{3}'.format(city_pinyin_name, SPIDER_NAME, area_pinyin_name, num)
+            page = 'http://{0}.{1}.com/ershoufang/{2}/pg{3}{4}'.format(city_pinyin_name, SPIDER_NAME, area_pinyin_name, num, filter_string)
+            #page = 'https://sh.lianjia.com/ershoufang/meilong/pg1sf3/'
             print(page)  # 打印每一页的地址
             headers = create_headers()
             BaseSpider.random_delay()
             response = requests.get(page, timeout=20, headers=headers)
             html = response.content
             soup = BeautifulSoup(html, "lxml")
-            #print("debug soup: ", soup)
+            # print("debug soup: ", soup)
 
             li_class = 'clear LOGVIEWDATA LOGCLICKDATA'
             totalprice_class = 'totalPrice totalPrice2'
@@ -114,7 +129,7 @@ class ErShouSpider(BaseSpider):
             img_class = 'lj-lazy'
             # 获得有小区信息的panel
             house_elements = soup.find_all('li', class_=li_class)
-            #print("debug, house_elements: ", house_elements)
+            # print("debug, house_elements: ", house_elements)
             for house_elem in house_elements:
                 title = house_elem.find('div', class_=title_class)
                 position = house_elem.find('div', class_=position_class)
@@ -124,7 +139,7 @@ class ErShouSpider(BaseSpider):
                 pic = house_elem.find('img', class_=img_class)
 
                 # 继续清理数据
-                #print(title.text.strip)
+                #print(title.text.strip())
                 #print(position.text)
                 #print(total_price.text)
                 #print(unit_price.text)
@@ -148,8 +163,8 @@ class ErShouSpider(BaseSpider):
     def start(self):
         city = get_city()
         self.city_pinyin_name = city
-        self.today_path = create_date_path("{0}/ershou".format(SPIDER_NAME), city, self.date_string)
-        self.summary_path = create_summary_path("{0}/ershou".format(SPIDER_NAME), city)
+        self.today_path = create_date_path("{0}/ershou_bieshu".format(SPIDER_NAME), city, self.date_string)
+        self.summary_path = create_summary_path("{0}/ershou_bieshu".format(SPIDER_NAME), city)
         self.ershou_analyzer.set_base_info(self.city_pinyin_name, self.summary_path)
 
         t1 = time.time()  # 开始计时
